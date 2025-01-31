@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->string('event_type');
             $table->json('event_data');
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
         });
     }
 
