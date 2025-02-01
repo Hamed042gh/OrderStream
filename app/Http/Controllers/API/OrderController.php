@@ -8,6 +8,9 @@ use App\Commands\Order\DeleteOrderCommand;
 use App\Commands\Order\DeleteOrderCommandHandler;
 use App\Commands\Order\UpdateOrderCommand;
 use App\Commands\Order\UpdateOrderCommandHandler;
+use App\Events\Order\CreateOrderEvent;
+use App\Events\Order\DeleteOrderEvent;
+use App\Events\Order\UpdateOrderEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\StoreUpdateOrderRequest;
@@ -36,7 +39,7 @@ class OrderController extends Controller
         $order = app(CreateOrderCommandHandler::class)->handle($command);
 
         Cache::tags(['orders'])->put("order_{$order->id}", $order, now()->addMinutes(10));
-
+        event(new CreateOrderEvent($order));
         return response()->json($order, 201);
     }
 
@@ -59,7 +62,7 @@ class OrderController extends Controller
         Cache::tags(['orders'])->forget("order_{$id}");
         Cache::tags(['orders'])->forget('orders');
         Cache::tags(['orders'])->put("order_{$order->id}", $order, now()->addMinutes(10));
-
+        event(new UpdateOrderEvent($order));
         return response()->json($order);
     }
 
@@ -71,7 +74,7 @@ class OrderController extends Controller
 
         Cache::tags(['orders'])->forget("order_{$id}");
         Cache::tags(['orders'])->forget('orders');
-
+        event(new DeleteOrderEvent($id));
         return response()->json(['message' => 'Order deleted successfully'], 204);
     }
 }

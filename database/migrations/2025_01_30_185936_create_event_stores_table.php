@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('event_stores', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->string('event_type');
-            $table->json('event_data');
+            $table->nullableMorphs('entity'); 
+            $table->string('event_type'); 
+            $table->json('event_data'); 
             $table->timestamps();
         });
     }

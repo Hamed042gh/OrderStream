@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class EventStore extends Model
 {
     use HasFactory;
-    protected $fillable = ['order_id', 'event_type', 'event_data'];
+    protected $fillable = ['order_id', 'event_type', 'event_data' ,'entity_id',
+    'entity_type',];
 
     // مشخص کردن فیلد event_data به‌عنوان نوع JSON
     protected $casts = [
