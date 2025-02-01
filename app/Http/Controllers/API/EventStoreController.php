@@ -10,84 +10,70 @@ use Illuminate\Support\Facades\Cache;
 class EventStoreController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * نمایش لیست رویدادها
      */
     public function index()
     {
-        // استفاده از remember برای ذخیره‌سازی و بازیابی از کش
         $events = Cache::remember('event_stores', now()->addMinutes(10), function () {
-            return EventStore::all();  // در صورت عدم وجود در کش، داده‌ها از دیتابیس بارگذاری می‌شود
+            return EventStore::select('id', 'name', 'created_at')->get(); // دریافت فقط فیلدهای مورد نیاز
         });
 
         return response()->json($events);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * ایجاد رویداد جدید
      */
     public function store(StoreEventStoreRequest $request)
     {
-        // ایجاد رویداد جدید با داده‌های معتبر از فرم رکویست
-        $eventStore = EventStore::create($request->validated());
+        try {
+            $eventStore = EventStore::create($request->validated());
+            Cache::put("event_store_{$eventStore->id}", $eventStore, now()->addMinutes(10));
+            Cache::forget('event_stores');
 
-        // پاک کردن کش مربوط به لیست تمام رویدادها
-        Cache::forget('event_stores');
-
-        // ذخیره این رویداد خاص در کش
-        Cache::put("event_store_{$eventStore->id}", $eventStore, now()->addMinutes(10));
-
-        return response()->json($eventStore, 201);  // پاسخ موفقیت‌آمیز با کد 201
+            return response()->json($eventStore, 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to create event', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**
-     * Display the specified resource.
+     * نمایش یک رویداد خاص
      */
     public function show(string $id)
     {
-        // استفاده از remember برای ذخیره‌سازی و بازیابی رویداد خاص از کش
         $eventStore = Cache::remember("event_store_{$id}", now()->addMinutes(10), function () use ($id) {
-            return EventStore::findOrFail($id);  // در صورت عدم وجود در کش، داده‌ها از دیتابیس بارگذاری می‌شود
+            return EventStore::findOrFail($id);
         });
 
         return response()->json($eventStore);
     }
 
     /**
-     * Update the specified resource in storage.
+     * به‌روزرسانی رویداد
      */
     public function update(StoreEventStoreRequest $request, string $id)
     {
-        // جستجو برای رویداد با ID مشخص
         $eventStore = EventStore::findOrFail($id);
-
-        // به‌روزرسانی رویداد
         $eventStore->update($request->validated());
 
-        // ذخیره مجدد در کش
-        Cache::forget("event_store_{$id}");  // کش این رویداد خاص را پاک می‌کند
-        Cache::put("event_store_{$id}", $eventStore, now()->addMinutes(10));  // کش ۱۰ دقیقه
-
-        // پاک‌سازی کش لیست تمام رویدادها
+        Cache::put("event_store_{$id}", $eventStore, now()->addMinutes(10));
         Cache::forget('event_stores');
 
         return response()->json($eventStore);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * حذف رویداد
      */
     public function destroy(string $id)
     {
-        // جستجو برای رویداد با ID مشخص
         $eventStore = EventStore::findOrFail($id);
-
-        // حذف رویداد
         $eventStore->delete();
 
-        // پاک‌سازی کش‌های مربوطه
         Cache::forget("event_store_{$id}");
-        Cache::forget('event_stores');  // کش لیست تمام رویدادها را پاک می‌کند
+        Cache::forget('event_stores');
 
-        return response()->json(['message' => 'EventStore deleted successfully'], 204);  // پاسخ موفقیت‌آمیز با کد 204
+        return response()->json(['message' => 'EventStore deleted successfully'], 204);
     }
 }
