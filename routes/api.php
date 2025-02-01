@@ -3,13 +3,20 @@
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\OrderitemController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-Route::prefix('v1')->group(function () {
+
+
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
+
+
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Command Routes
 
@@ -33,9 +40,10 @@ Route::prefix('v1')->group(function () {
     Route::put('/products/{product}', [ProductController::class, 'update']);
     // Delete a product
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+});
 
-    // Query Routes
-
+// Query Routes
+Route::prefix('v1')->group(function () {
     // Get a list of all orders
     Route::get('/orders', [OrderController::class, 'index']);
     // Get details of a specific order

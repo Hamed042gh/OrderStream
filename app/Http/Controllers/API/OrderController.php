@@ -2,84 +2,76 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Commands\Order\CreateOrderCommand;
+use App\Commands\Order\CreateOrderCommandHandler;
+use App\Commands\Order\DeleteOrderCommand;
+use App\Commands\Order\DeleteOrderCommandHandler;
+use App\Commands\Order\UpdateOrderCommand;
+use App\Commands\Order\UpdateOrderCommandHandler;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\StoreUpdateOrderRequest;
-use App\Models\Order;
+use App\Queries\Order\GetAllOrdersQuery;
+use App\Queries\Order\GetAllOrdersQueryHandler;
+use App\Queries\Order\GetOrderQuery;
+use App\Queries\Order\GetOrderQueryHandler;
 use Illuminate\Support\Facades\Cache;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the orders.
-     */
+    // List all orders
     public function index()
     {
-        // Check Redis cache for orders
-        $orders = Cache::remember('orders', 60, function () {
-            return Order::all(); // If not in cache, fetch from the database
-        });
+        $query = new GetAllOrdersQuery();
+        $orders = app(GetAllOrdersQueryHandler::class)->handle($query);
+
         return response()->json($orders);
     }
 
-    /**
-     * Store a newly created order in storage.
-     */
+    // Store a new order
     public function store(StoreOrderRequest $request)
-    {
-        // Create a new order
-        $order = Order::create($request->validated());
+    { 
+        $orderData = $request->validated();
+        $command = new CreateOrderCommand($orderData);
+        $order = app(CreateOrderCommandHandler::class)->handle($command);
 
-        // Clear the cache related to orders to refresh data
-        Cache::forget('orders');
+        Cache::tags(['orders'])->put("order_{$order->id}", $order, now()->addMinutes(10));
 
-        return response()->json($order, 201); // Return the created order with 201 status code
+        return response()->json($order, 201);
     }
 
-    /**
-     * Display the specified order.
-     */
+    // Show a specific order
     public function show(string $id)
     {
-        // Check Redis cache for a specific order
-        $order = Cache::remember("order_{$id}", 60, function () use ($id) {
-            return Order::findOrFail($id); // If not in cache, fetch from the database
-        });
+        $query = new GetOrderQuery($id);
+        $order = app(GetOrderQueryHandler::class)->handle($query);
 
-        return response()->json($order); // Return the order data
+        return response()->json($order);
     }
 
-    /**
-     * Update the specified order in storage.
-     */
+    // Update a specific order
     public function update(StoreUpdateOrderRequest $request, string $id)
     {
-        // Find the order by ID
-        $order = Order::findOrFail($id);
+        $orderData = $request->validated();
+        $command = new UpdateOrderCommand($id, $orderData);
+        $order = app(UpdateOrderCommandHandler::class)->handle($command);
 
-        // Update the order with validated data
-        $order->update($request->validated());
+        Cache::tags(['orders'])->forget("order_{$id}");
+        Cache::tags(['orders'])->forget('orders');
+        Cache::tags(['orders'])->put("order_{$order->id}", $order, now()->addMinutes(10));
 
-        // Clear the cache related to the specific order and the orders list
-        Cache::forget("order_{$id}");
-        Cache::forget('orders');
-
-        return response()->json($order); // Return the updated order data
+        return response()->json($order);
     }
 
-    /**
-     * Remove the specified order from storage.
-     */
+    // Delete a specific order
     public function destroy(string $id)
     {
-        // Find and delete the order by ID
-        $order = Order::findOrFail($id);
-        $order->delete();
+        $command = new DeleteOrderCommand($id);
+        app(DeleteOrderCommandHandler::class)->handle($command);
 
-        // Clear the cache related to the specific order and the orders list
-        Cache::forget("order_{$id}");
-        Cache::forget('orders');
+        Cache::tags(['orders'])->forget("order_{$id}");
+        Cache::tags(['orders'])->forget('orders');
 
-        return response()->json(['message' => 'Order deleted successfully'], 204); // Return a success message
+        return response()->json(['message' => 'Order deleted successfully'], 204);
     }
 }
