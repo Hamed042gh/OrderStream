@@ -12,15 +12,17 @@ class CreateOrderEvent
     public $entity_type;
     public $entity_id;
     public $event_data;
+    public $event_type;
 
     public function __construct(Order $order)
     {
 
         $this->entity_type = 'Order';
         $this->entity_id = $order->id;
+        $this->event_type = 'CreateOrder';
         $this->event_data = json_encode([
             'user_id' => $order->user_id,
-            'order_id' => $order->id,
+            'status' => $order->status,
             'total_price' => $order->total_price,
         ]);
     }

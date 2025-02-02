@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Order;
 
 use App\Events\Order\CreateOrderEvent;
 use App\Jobs\StoreCreateOrderJob;
@@ -13,10 +13,11 @@ class StoreCreateOrderEvent
 
     public function handle(CreateOrderEvent $event)
     {
+        
         // Convert JSON to array
         $eventDataArray = json_decode($event->event_data, true);
 
         // Dispatch the job to store the event data
-        StoreCreateOrderJob::dispatch($eventDataArray, 'CreateOrder', 'Order');
+        StoreCreateOrderJob::dispatch($eventDataArray,$event->event_type, $event->entity_type, $event->entity_id);
     }
 }

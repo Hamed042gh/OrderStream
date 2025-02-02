@@ -8,6 +8,7 @@ use App\Commands\Product\DeleteProductCommand;
 use App\Commands\Product\DeleteProductCommandHandler;
 use App\Commands\Product\UpdateProductCommand;
 use App\Commands\Product\UpdateProductCommandHandler;
+use App\Events\Product\CreateProductEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\StoreUpdateProductRequest;
@@ -37,7 +38,7 @@ class ProductController extends Controller
 
         // Cache the product
         Cache::tags(['products'])->put("product_{$product->id}", $product, now()->addMinutes(10));
-
+        event(new CreateProductEvent($product));
         return response()->json($product, 201);
     }
 

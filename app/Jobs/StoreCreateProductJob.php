@@ -3,12 +3,11 @@
 namespace App\Jobs;
 
 use App\Repositories\EventStoreRepository;
-
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Validator;
 
-class StoreCreateOrderJob implements ShouldQueue
+class StoreCreateProductJob implements ShouldQueue
 {
     use Queueable;
     protected $eventDataArray;
@@ -22,6 +21,7 @@ class StoreCreateOrderJob implements ShouldQueue
         $this->eventType = $eventType;
         $this->entityType = $entityType;
         $this->entityId = $entityId;
+       
         
     }
 
@@ -30,11 +30,11 @@ class StoreCreateOrderJob implements ShouldQueue
        
         // Validate data
         $validator = Validator::make($this->eventDataArray, [
-            'user_id' => 'required|integer',
-            'status' => 'required',
-            'total_price' => 'required|numeric',
+            'name' => 'required',
+            'price' => 'required',
+            'stock' => 'required',
         ]);
-
+       
         if ($validator->fails()) {
             // Handle validation errors
             // For now, you can log the error or notify

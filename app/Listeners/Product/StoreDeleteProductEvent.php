@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Product;
 
-use App\Events\Order\DeleteOrderEvent;
+use App\Events\Product\DeleteProductEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class StoreDeleteOrderEvent
+class StoreDeleteProductEvent
 {
     /**
      * Create the event listener.
@@ -19,7 +19,7 @@ class StoreDeleteOrderEvent
     /**
      * Handle the event.
      */
-    public function handle(DeleteOrderEvent $event): void
+    public function handle(DeleteProductEvent $event): void
     {
         //
     }

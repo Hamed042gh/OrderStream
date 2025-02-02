@@ -7,12 +7,13 @@ use App\Models\EventStore;
 class EventStoreRepository
 {
     // Store event data in EventStore
-    public function storeEvent($eventDataArray, $eventType, $entityType)
+    public function storeEvent($eventDataArray,$event_type, $entity_type, $entity_id)
     {
+        
         return EventStore::create([
-            'entity_id' => $eventDataArray['order_id'],  // Using order_id from the validated data
-            'entity_type' => $entityType,  // Using entityType
-            'event_type' => $eventType,    // Using eventType
+            'entity_id' => $entity_id,  
+            'entity_type' => $entity_type,  // Using entityType
+            'event_type' => $event_type,    // Using eventType
             'event_data' => json_encode($eventDataArray), // Storing data as JSON
         ]);
     }

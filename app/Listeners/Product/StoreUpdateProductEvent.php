@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Product;
 
-use App\Events\Order\UpdateOrderEvent;
+use App\Events\Product\UpdateProductEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class StoreUpdateOrderEvent
+class StoreUpdateProductEvent
 {
     /**
      * Create the event listener.
@@ -19,7 +19,7 @@ class StoreUpdateOrderEvent
     /**
      * Handle the event.
      */
-    public function handle(UpdateOrderEvent $event): void
+    public function handle(UpdateProductEvent $event): void
     {
         //
     }
