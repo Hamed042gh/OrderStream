@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Commands\Orderitem\CreateOrderitemCommand;
+use App\Commands\Orderitem\CreateOrderitemCommandHandler;
+use App\Events\Orderitem\CreateOrderItemEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderitemRequest;
 use App\Http\Requests\StoreUpdateOrderitemRequest;
@@ -16,7 +19,7 @@ class OrderitemController extends Controller
     public function index()
     {
         $orderitems = Cache::remember('orderitems', 60, function () {
-            return Orderitem::select('id', 'name', 'price', 'quantity')->get(); // دریافت فقط فیلدهای مورد نیاز
+            return Orderitem::all(); 
         });
 
         return response()->json($orderitems);
@@ -28,10 +31,12 @@ class OrderitemController extends Controller
     public function store(StoreOrderitemRequest $request)
     {
         try {
-            $orderitem = Orderitem::create($request->validated());
+            $orderitemData = $request->validated();
+            $command = new CreateOrderitemCommand($orderitemData);
+            $orderitem = app(CreateOrderitemCommandHandler::class)->handle($command);
             Cache::put("orderitem_{$orderitem->id}", $orderitem, 60);
             Cache::forget('orderitems');
-
+            event(new CreateOrderItemEvent($orderitem));
             return response()->json($orderitem, 201);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to create order item', 'error' => $e->getMessage()], 500);

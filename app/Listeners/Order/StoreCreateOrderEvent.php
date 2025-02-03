@@ -3,7 +3,7 @@
 namespace App\Listeners\Order;
 
 use App\Events\Order\CreateOrderEvent;
-use App\Jobs\StoreCreateOrderJob;
+use App\Jobs\Order\StoreCreateOrderJob;
 
 
 class StoreCreateOrderEvent

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events\Product;
+namespace App\Events\Orderitem;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -10,14 +10,14 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class DeleteProductEvent
+class DeleteOrderItemEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public int $productId;
+    public int $orderitemId;
 
-    public function __construct(int $productId)
+    public function __construct(int $orderitemId)
     {
-        $this->productId = $productId;
+        $this->orderitemId = $orderitemId;
     }
 }

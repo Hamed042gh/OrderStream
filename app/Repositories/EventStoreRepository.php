@@ -37,4 +37,22 @@ class EventStoreRepository
             ->where('entity_type', get_class($entity))
             ->get();
     }
+
+       // Get order state by order ID
+       public function getOrderState($orderId)
+       {
+           $events = EventStore::where('entity_id', $orderId)
+               ->where('entity_type', 'Order')
+               ->orderBy('created_at', 'asc')
+               ->get();
+   
+           $orderState = [];
+   
+           foreach ($events as $event) {
+               $data = json_decode($event->event_data, true);
+               $orderState = array_merge($orderState, $data['changed_attributes']);
+           }
+   
+           return $orderState;
+       }
 }

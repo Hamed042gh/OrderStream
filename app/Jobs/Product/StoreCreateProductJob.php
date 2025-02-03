@@ -1,30 +1,15 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\Product;
 
+use App\Jobs\Base\BaseCreateJob;
 use App\Repositories\EventStoreRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Validator;
 
-class StoreCreateProductJob implements ShouldQueue
+class StoreCreateProductJob extends BaseCreateJob
 {
-    use Queueable;
-    protected $eventDataArray;
-    protected $eventType;
-    protected $entityType;
-    protected $entityId;
-
-    public function __construct($eventDataArray, $eventType, $entityType,$entityId)
-    {
-        $this->eventDataArray = $eventDataArray;
-        $this->eventType = $eventType;
-        $this->entityType = $entityType;
-        $this->entityId = $entityId;
-       
-        
-    }
-
     public function handle(EventStoreRepository $eventStore)
     {
        
@@ -36,9 +21,6 @@ class StoreCreateProductJob implements ShouldQueue
         ]);
        
         if ($validator->fails()) {
-            // Handle validation errors
-            // For now, you can log the error or notify
-            // Here we return errors, but you could choose to handle them differently
             return $validator->errors();
         }
 

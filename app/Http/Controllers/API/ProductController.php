@@ -9,6 +9,8 @@ use App\Commands\Product\DeleteProductCommandHandler;
 use App\Commands\Product\UpdateProductCommand;
 use App\Commands\Product\UpdateProductCommandHandler;
 use App\Events\Product\CreateProductEvent;
+use App\Events\Product\DeleteProductEvent;
+use App\Events\Product\UpdateProductEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\StoreUpdateProductRequest;
@@ -58,12 +60,13 @@ class ProductController extends Controller
         $command = new UpdateProductCommand($productData, $id);
        
         $product = app(UpdateProductCommandHandler::class)->handle($command);
-
+        $changedAttributes = $product->getChanges();
+        // dd($changedAttributes);
         // Clear and update cache
         Cache::tags(['products'])->forget("product_{$id}");
         Cache::tags(['products'])->forget('products');
         Cache::tags(['products'])->put("product_{$product->id}", $product, now()->addMinutes(10));
-
+        event(new UpdateProductEvent($product, $changedAttributes));
         return response()->json($product);
     }
 
@@ -76,7 +79,7 @@ class ProductController extends Controller
         // Remove from cache
         Cache::tags(['products'])->forget("product_{$id}");
         Cache::tags(['products'])->forget('products');
-
+        event(new DeleteProductEvent($id));
         return response()->json(['message' => 'Product deleted successfully'], 204);
     }
 }

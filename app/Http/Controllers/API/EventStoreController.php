@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\Cache;
 
 class EventStoreController extends Controller
 {
-    /**
-     * نمایش لیست رویدادها
-     */
+
     public function index()
     {
         $events = Cache::remember('event_stores', now()->addMinutes(10), function () {
@@ -21,9 +19,7 @@ class EventStoreController extends Controller
         return response()->json($events);
     }
 
-    /**
-     * ایجاد رویداد جدید
-     */
+
     public function store(StoreEventStoreRequest $request)
     {
         try {
@@ -37,9 +33,6 @@ class EventStoreController extends Controller
         }
     }
 
-    /**
-     * نمایش یک رویداد خاص
-     */
     public function show(string $id)
     {
         $eventStore = Cache::remember("event_store_{$id}", now()->addMinutes(10), function () use ($id) {
@@ -49,9 +42,7 @@ class EventStoreController extends Controller
         return response()->json($eventStore);
     }
 
-    /**
-     * به‌روزرسانی رویداد
-     */
+ 
     public function update(StoreEventStoreRequest $request, string $id)
     {
         $eventStore = EventStore::findOrFail($id);
@@ -63,9 +54,7 @@ class EventStoreController extends Controller
         return response()->json($eventStore);
     }
 
-    /**
-     * حذف رویداد
-     */
+
     public function destroy(string $id)
     {
         $eventStore = EventStore::findOrFail($id);

@@ -10,10 +10,20 @@ class UpdateOrderEvent
 {
     use Dispatchable, SerializesModels;
 
-    public Order $order;
+    public $entity_type;
+    public $entity_id;
+    public $event_data;
+    public $event_type;
 
-    public function __construct(Order $order)
+    public function __construct(Order $order, array $changedAttributes)
     {
-        $this->order = $order;
+        $this->entity_type = 'Order';
+        $this->entity_id = $order->id;
+        $this->event_type = 'UpdateOrder';
+        unset($changedAttributes['updated_at']);
+        $this->event_data = json_encode([
+            'changed_attributes' => $changedAttributes,
+            'updated_at' => now(),
+        ]);
     }
 }

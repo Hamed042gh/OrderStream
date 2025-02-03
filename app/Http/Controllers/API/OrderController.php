@@ -58,11 +58,17 @@ class OrderController extends Controller
         $orderData = $request->validated();
         $command = new UpdateOrderCommand($id, $orderData);
         $order = app(UpdateOrderCommandHandler::class)->handle($command);
+        $changedAttributes = $order->getChanges();
 
+        // پاک کردن کش قدیمی
         Cache::tags(['orders'])->forget("order_{$id}");
         Cache::tags(['orders'])->forget('orders');
+    
+        // ذخیره کش جدید
         Cache::tags(['orders'])->put("order_{$order->id}", $order, now()->addMinutes(10));
-        event(new UpdateOrderEvent($order));
+    
+        // ارسال رویداد به همراه تغییرات
+        event(new UpdateOrderEvent($order, $changedAttributes));
         return response()->json($order);
     }
 
@@ -71,7 +77,6 @@ class OrderController extends Controller
     {
         $command = new DeleteOrderCommand($id);
         app(DeleteOrderCommandHandler::class)->handle($command);
-
         Cache::tags(['orders'])->forget("order_{$id}");
         Cache::tags(['orders'])->forget('orders');
         event(new DeleteOrderEvent($id));

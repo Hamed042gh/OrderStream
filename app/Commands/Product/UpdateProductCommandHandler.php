@@ -11,12 +11,9 @@ class UpdateProductCommandHandler
     {
         $product = Product::findOrFail($command->id);
     
-        $product->name = $command->productData['name'] ?? $product->name;
-        $product->price = $command->productData['price'] ?? $product->price;
-        $product->stock = $command->productData['stock'] ?? $product->stock;
-    
-        $product->save();
-    
+        //Update database with new data
+        $product->update($command->productData);
+
         return $product;
     }
     

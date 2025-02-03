@@ -3,7 +3,7 @@
 namespace App\Listeners\Product;
 
 use App\Events\Product\CreateProductEvent;
-use App\Jobs\StoreCreateProductJob;
+use App\Jobs\Product\StoreCreateProductJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Events\Product;
+namespace App\Events\Orderitem;
 
-use App\Models\Product;
+use App\Models\Orderitem;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,25 +11,25 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateProductEvent
+class CreateOrderItemEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
     public $entity_type;
     public $entity_id;
     public $event_data;
     public $event_type;
 
-    public function __construct(Product $product, array $changedAttributes)
+    public function __construct(Orderitem $orderitem)
     {
-        
-        $this->entity_type = 'Product';
-        $this->entity_id = $product->id;
-        $this->event_type = 'UpdateProduct';
-        unset($changedAttributes['updated_at']);
+        $this->entity_type = 'Orderitem';
+        $this->entity_id = $orderitem->id;
+        $this->event_type = 'CreateOrderitem';
         $this->event_data = json_encode([
-            'changed_attributes' => $changedAttributes,
-            'updated_at' => now(),
+            'order_id' => $orderitem->order_id,
+            'product_id' => $orderitem->product_id,
+            'quantity' => $orderitem->quantity,
+            'unit_price' => $orderitem->unit_price,
+        
         ]);
     }
 }

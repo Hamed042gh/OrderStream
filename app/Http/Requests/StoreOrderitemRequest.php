@@ -25,7 +25,7 @@ class StoreOrderitemRequest extends FormRequest
             'order_id' => ['required', 'integer'],
             'product_id' => ['required', 'integer'],
             'quantity' => ['required', 'integer'],
-            'price' => ['required', 'numeric'],
+            'unit_price' => ['required', 'numeric'],
         ];
     }
 }
