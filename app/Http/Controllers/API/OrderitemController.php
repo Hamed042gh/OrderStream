@@ -4,7 +4,13 @@ namespace App\Http\Controllers\API;
 
 use App\Commands\Orderitem\CreateOrderitemCommand;
 use App\Commands\Orderitem\CreateOrderitemCommandHandler;
+use App\Commands\Orderitem\DeleteOrderitemCommand;
+use App\Commands\Orderitem\DeleteOrderitemCommandHandler;
+use App\Commands\Orderitem\UpdateOrderitemCommand;
+use App\Commands\Orderitem\UpdateOrderitemCommandHandler;
 use App\Events\Orderitem\CreateOrderItemEvent;
+use App\Events\Orderitem\DeleteOrderItemEvent;
+use App\Events\Orderitem\UpdateOrderItemEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderitemRequest;
 use App\Http\Requests\StoreUpdateOrderitemRequest;
@@ -60,12 +66,14 @@ class OrderitemController extends Controller
      */
     public function update(StoreUpdateOrderitemRequest $request, string $id)
     {
-        $orderitem = Orderitem::findOrFail($id);
-        $orderitem->update($request->validated());
+        $orderitemData = $request->validated();
+        $command = new UpdateOrderitemCommand($id, $orderitemData);
+        $orderitem = app(UpdateOrderitemCommandHandler::class)->handle($command);
+        $changedAttributes = $orderitem->getChanges();
 
         Cache::put("orderitem_{$orderitem->id}", $orderitem, 60);
         Cache::forget('orderitems');
-
+        event(new UpdateOrderItemEvent($orderitem, $changedAttributes));
         return response()->json($orderitem);
     }
 
@@ -74,12 +82,11 @@ class OrderitemController extends Controller
      */
     public function destroy(string $id)
     {
-        $orderitem = Orderitem::findOrFail($id);
-        $orderitem->delete();
-
-        Cache::forget("orderitem_{$id}");
-        Cache::forget('orderitems');
-
+        $command = new DeleteOrderitemCommand($id);
+        app(DeleteOrderitemCommandHandler::class)->handle($command);
+        Cache::tags(['orderitems'])->forget("orderitem_{$id}");
+        Cache::tags(['orderitems'])->forget('orderitems');
+        event(new DeleteOrderItemEvent($id));
         return response()->json(['message' => 'Orderitem deleted successfully'], 204);
     }
 }

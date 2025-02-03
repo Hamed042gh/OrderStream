@@ -3,24 +3,15 @@
 namespace App\Listeners\Orderitem;
 
 use App\Events\Orderitem\DeleteOrderItemEvent;
+use App\Jobs\Orderitem\StoreDeleteOrderItemJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
 class StoreDeleteOrderItemEvent
 {
-    /**
-     * Create the event listener.
-     */
-    public function __construct()
+    public function handle(DeleteOrderitemEvent $event)
     {
-        //
-    }
-
-    /**
-     * Handle the event.
-     */
-    public function handle(DeleteOrderItemEvent $event): void
-    {
-        //
+  
+        StoreDeleteOrderItemJob::dispatch($event->orderitemId);
     }
 }

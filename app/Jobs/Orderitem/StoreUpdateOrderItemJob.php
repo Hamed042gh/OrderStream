@@ -2,26 +2,21 @@
 
 namespace App\Jobs\Orderitem;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
+use App\Jobs\Base\BaseCreateJob;
+use App\Repositories\EventStoreRepository;
+use Illuminate\Support\Facades\Log;
 
-class StoreUpdateOrderItemJob implements ShouldQueue
+class StoreUpdateOrderItemJob extends BaseCreateJob
 {
-    use Queueable;
-
-    /**
-     * Create a new job instance.
-     */
-    public function __construct()
+    
+    public function handle(EventStoreRepository $eventStore)
     {
-        //
-    }
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
-    {
-        //
+        if (empty($this->eventDataArray['changed_attributes'])) {
+            Log::info("No changes detected for Orderitem ID: {$this->entityId}");
+            return;
+        }
+
+        $eventStore->storeEvent($this->eventDataArray, $this->eventType, $this->entityType, $this->entityId);
     }
 }

@@ -2,28 +2,13 @@
 
 namespace App\Jobs\Product;
 
+use App\Jobs\Base\BaseCreateJob;
 use App\Repositories\EventStoreRepository;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
-class StoreUpdateProductJob implements ShouldQueue
+class StoreUpdateProductJob extends BaseCreateJob
 {
-    use Queueable;
-
-    protected $eventDataArray;
-    protected $eventType;
-    protected $entityType;
-    protected $entityId;
-
-    public function __construct($eventDataArray, $eventType, $entityType, $entityId)
-    {
-        $this->eventDataArray = $eventDataArray;
-        $this->eventType = $eventType;
-        $this->entityType = $entityType;
-        $this->entityId = $entityId;
-    }
-
+   
     public function handle(EventStoreRepository $eventStore)
     {
 

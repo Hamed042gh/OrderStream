@@ -4,8 +4,6 @@ namespace App\Jobs\Product;
 
 use App\Jobs\Base\BaseCreateJob;
 use App\Repositories\EventStoreRepository;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Validator;
 
 class StoreCreateProductJob extends BaseCreateJob

@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Orderitem;
 
+use App\Repositories\EventStoreRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -9,19 +10,20 @@ class StoreDeleteOrderItemJob implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct()
+    protected $orderitemId;
+
+    public function __construct($orderitemId)
     {
-        //
+        $this->orderitemId = $orderitemId;
     }
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(EventStoreRepository $eventStore)
     {
-        //
+        $eventStore->storeEvent(
+            ['orderitem_id' => $this->orderitemId],
+            'DeleteOrderitem',
+            'Orderitem',
+            $this->orderitemId
+        );
     }
 }
