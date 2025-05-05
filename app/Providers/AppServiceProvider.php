@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if ($this->app->runningUnitTests() && !app()->environment('testing')) {
+            exit("❌ You must run tests only in the 'testing' environment.");
+        }
+        
     }
 }
