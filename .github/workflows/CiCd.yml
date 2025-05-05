@@ -1,0 +1,45 @@
+name: Laravel Docker CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy .env.testing to .env
+        run: cp app/.env.testing app/.env
+
+      - name: Set up Docker Compose
+        run: docker compose up -d --build
+
+      - name: Wait for MySQL
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          until docker exec laravel-mysql mysqladmin ping -h "mysql" --silent; do
+            sleep 5
+          done
+      - name: Install composer dependencies
+        run: docker exec laravel-app composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Run migrations
+        run: docker exec laravel-app php artisan migrate --force
+
+      - name: Install NPM dependencies
+        run: docker exec laravel-app npm install
+
+      - name: Build assets using Vite
+        run: docker exec laravel-app npm run build
+
+      - name: Run Laravel Tests
+        run: docker exec laravel-app php artisan test
+
+      - name: Shut down containers
+        if: always()
+        run: docker compose down -v

@@ -1,0 +1,102 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-app
+    working_dir: /var/www/html
+    volumes:
+      - ./app/OrderStream:/var/www/html
+
+    depends_on:
+      - mysql
+    networks:
+      - laravel
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: laravel-nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./app/OrderStream:/var/www/html
+
+     
+    depends_on:
+      - app
+    networks:
+      - laravel
+
+  mysql:
+    image: mysql:8.0
+    container_name: laravel-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: OrderStream
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - laravel
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    container_name: laravel-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - laravel
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: laravel-phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - mysql
+    networks:
+      - laravel
+
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    ports:
+      - "8025:8025"
+    networks:
+      - laravel
+
+  horizon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-horizon
+    command: php artisan horizon
+    depends_on:
+      - app
+      - redis
+    volumes:
+      - ./app/OrderStream:/var/www/html
+    networks:
+      - laravel
+networks:
+  laravel:
+
+volumes:
+  mysql-data:
