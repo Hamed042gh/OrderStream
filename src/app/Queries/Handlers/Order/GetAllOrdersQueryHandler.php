@@ -2,6 +2,7 @@
 namespace App\Queries\Handlers\Order;
 
 use App\Models\Order;
+use App\Queries\Order\GetAllOrdersQuery;
 use Illuminate\Support\Facades\Cache;
 
 class GetAllOrdersQueryHandler

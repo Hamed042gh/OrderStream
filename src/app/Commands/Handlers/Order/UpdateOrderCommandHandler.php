@@ -1,6 +1,7 @@
 <?php
 namespace App\Commands\Handlers\Order;
 
+use App\Commands\Order\UpdateOrderCommand;
 use App\Models\Order;
 
 class UpdateOrderCommandHandler

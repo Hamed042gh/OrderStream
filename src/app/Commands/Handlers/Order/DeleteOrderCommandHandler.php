@@ -1,6 +1,7 @@
 <?php
 namespace App\Commands\Handlers\Order;
 
+use App\Commands\Order\DeleteOrderCommand;
 use App\Models\Order;
 
 class DeleteOrderCommandHandler
