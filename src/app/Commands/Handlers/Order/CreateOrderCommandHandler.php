@@ -1,6 +1,7 @@
 <?php
 namespace App\Commands\Handlers\Order;
 
+use App\Commands\Order\CreateOrderCommand;
 use App\Models\Order;
 
 class CreateOrderCommandHandler

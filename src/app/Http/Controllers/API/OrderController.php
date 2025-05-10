@@ -18,6 +18,7 @@ use App\Queries\Handlers\Order\GetAllOrdersQueryHandler;
 use App\Queries\Handlers\Order\GetOrderQueryHandler;
 use App\Queries\Order\GetAllOrdersQuery;
 use App\Queries\Order\GetOrderQuery;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -36,8 +37,13 @@ class OrderController extends Controller
     // Store a new order
     public function store(StoreOrderRequest $request, CreateOrderCommandHandler $handler)
     {
+        if (!Auth::check()) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+    
         $orderData = $request->validated();
-
+        $orderData['user_id'] = Auth::user()->id;
+        $order = null;
         try {
             $command = new CreateOrderCommand($orderData);
             $order = $handler->handle($command);
@@ -48,6 +54,7 @@ class OrderController extends Controller
 
         } catch (\Throwable $e) {
             $this->logOrderError($e);
+            Log::error('Error creating order: ' . $e->getMessage());
             return $this->failedResponse($order);
         }
     }

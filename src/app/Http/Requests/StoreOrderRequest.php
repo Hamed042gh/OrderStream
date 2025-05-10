@@ -22,7 +22,6 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'user_id' => ['required', 'integer'],
            'status' => ['required','string'],
            'total_price' => ['required', 'numeric'],
         ];
