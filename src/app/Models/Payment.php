@@ -2,14 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
+use App\Models\Reservation;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Payment extends Model
 {
     use HasFactory;
-   protected $fillable = ['order_id', 'amount', 'status', 'method'];
-   public function order() {
-       return $this->belongsTo(Order::class);
-   }
+    
+    protected $fillable =
+    [
+        'amount',
+        'user_id',
+        'status',
+        'payer_name',
+        'payer_identity',
+        'order_id',
+        'track_id',
+        'reservation_id'
+    ];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    public function reservation()
+    {
+        return $this->belongsTo(Reservation::class);
+    }
 }

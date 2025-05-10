@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\Order;
+use App\Models\User;
+use App\Models\Payment;
+use App\Models\Reservation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -10,20 +12,18 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PaymentFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = Payment::class;
+
+    public function definition()
     {
         return [
-            'amount' => $this->faker->randomFloat(2, 1, 100),
-            'status' => $this->faker->randomElement(['pending', 'successful', 'failed']),
-            'order_id' => Order::factory(),
-            'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
-            'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
-            'method' => $this->faker->randomElement(['paypal', 'stripe', 'cod']),  // مقدار به‌صورت رشته
+            'track_id' => $this->faker->unique()->word,
+            'amount' => fake()->numberBetween(10000, 500000),
+            'payer_name' => $this->faker->name,
+            'payer_identity' => $this->faker->email,
+            'status' => 'pending',
+            'user_id' => User::factory(),
+            'reservation_id' => Reservation::factory(),
         ];
     }
 }

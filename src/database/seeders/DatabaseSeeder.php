@@ -2,13 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\EventStore;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Payment;
-use App\Models\Product;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Ticket;
+use App\Models\Payment;
+use App\Models\Reservation;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -19,15 +17,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory(10)->create();
-
-        Order::factory(10)->create();
-
-        // Product::factory(10)->create();
-
-        // OrderItem::factory(50)->create();
-
-        // Payment::factory(50)->create();
-
-        // EventStore::factory(50)->create();
+        Ticket::factory()->count(10)->create();
+        Payment::factory()->count(10)->create();
+        Reservation::factory()->count(10)->create();
     }
 }
