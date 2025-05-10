@@ -28,6 +28,7 @@ This project is an online ticket reservation system built with **Laravel**. It p
    - Filters for searching tickets by **origin**, **destination**, and **date**.
    - Optimized search using **Redis caching** for better performance and fast results.
 
+
 3. **Ticket Management**:
    - Full CRUD (Create, Read, Update, Delete) operations for tickets.
    - Built using **Filament** for an elegant admin interface to manage tickets.
